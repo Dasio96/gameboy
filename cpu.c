@@ -106,6 +106,56 @@ void cpu_step(CPU *cpu) {
     else
       cpu->f &= ~FLAG_H;
     break;
+  case 0xC3: {
+    uint16_t addr = memory_read(cpu->mem, cpu->pc++) |
+                    (memory_read(cpu->mem, cpu->pc++) << 8);
+    cpu->pc = addr;
+    break;
+  }
+  case 0x0E: {
+    uint8_t arg = memory_read(cpu->mem, cpu->pc);
+    cpu->pc++;
+    cpu->c = arg;
+    break;
+  }
+  case 0x16: {
+    uint8_t arg = memory_read(cpu->mem, cpu->pc);
+    cpu->pc++;
+    cpu->d = arg;
+    break;
+  }
+  case 0x1E: {
+    uint8_t arg = memory_read(cpu->mem, cpu->pc);
+    cpu->pc++;
+    cpu->e = arg;
+    break;
+  }
+  case 0x26: {
+    uint8_t arg = memory_read(cpu->mem, cpu->pc);
+    cpu->pc++;
+    cpu->h = arg;
+    break;
+  }
+  case 0x2E: {
+    uint8_t arg = memory_read(cpu->mem, cpu->pc);
+    cpu->pc++;
+    cpu->l = arg;
+    break;
+  }
+  case 0x3E: {
+    uint8_t arg = memory_read(cpu->mem, cpu->pc);
+    cpu->pc++;
+    cpu->a = arg;
+    break;
+  }
+  case 0x01: {
+    uint16_t val = memory_read(cpu->mem, cpu->pc++) |
+                   (memory_read(cpu->mem, cpu->pc++) << 8);
+    cpu->c = val & 0xFF;
+    cpu->b = (val >> 8) & 0xFF;
+    break;
+  }
+
   default:
     break;
   }
