@@ -1,8 +1,8 @@
-#include <stdint.h>
+#ifndef MEMORY_H
+#define MEMORY_H
 
-#ifndef MEMORY
+#include "stdint.h"
 
-#define MEMORY
 #define MEMORY_SIZE 0x10000
 
 typedef struct {
