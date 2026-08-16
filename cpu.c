@@ -361,6 +361,27 @@ void cpu_step(CPU *cpu) {
     break;
   }
 
+  case 0xCD: {
+    uint8_t lo = memory_read(cpu->mem, cpu->pc++);
+    uint8_t hi = memory_read(cpu->mem, cpu->pc++);
+    uint16_t target_addr = (hi << 8) | lo;
+
+    memory_write(cpu->mem, --cpu->sp, cpu->pc >> 8);
+    memory_write(cpu->mem, --cpu->sp, cpu->pc & 0xFF);
+
+    cpu->pc = target_addr;
+
+    break;
+  }
+
+  case 0xC9: {
+    uint8_t lo = memory_read(cpu->mem, cpu->pc++);
+    uint8_t hi = memory_read(cpu->mem, cpu->pc++);
+    cpu->pc = (hi << 8) | lo;
+
+    break;
+  }
+
   default:
     fprintf(stderr, "0x%02X, 0x%04X\n", opcode, cpu->pc - 1);
     break;
