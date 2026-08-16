@@ -268,6 +268,13 @@ void cpu_step(CPU *cpu) {
     break;
   }
 
+  case 0xC1: {
+    cpu->c = memory_read(cpu->mem, cpu->sp++);
+    cpu->b = memory_read(cpu->mem, cpu->sp++);
+
+    break;
+  }
+
   default:
     fprintf(stderr, "0x%02X, 0x%04X\n", opcode, cpu->pc - 1);
     break;
