@@ -1,6 +1,7 @@
 #include "cpu.h"
 #include "memory.h"
 #include <stdint.h>
+#include <stdio.h>
 
 #define FLAG_Z 0x80
 #define FLAG_N 0x40
@@ -11,14 +12,14 @@ void cpu_init(CPU *cpu, Memory *memory) {
   cpu->pc = 0x0100;
   cpu->sp = 0xFFFE;
 
-  cpu->a = 0;
-  cpu->b = 0;
-  cpu->c = 0;
-  cpu->d = 0;
-  cpu->e = 0;
-  cpu->f = 0;
-  cpu->h = 0;
-  cpu->l = 0;
+  cpu->a = 0x01;
+  cpu->b = 0x00;
+  cpu->c = 0x00;
+  cpu->d = 0x00;
+  cpu->e = 0x00;
+  cpu->f = 0xB0;
+  cpu->h = 0x00;
+  cpu->l = 0x00;
 
   cpu->mem = memory;
 }
@@ -30,47 +31,172 @@ void cpu_step(CPU *cpu) {
   switch (opcode) {
   case 0x00:
     break;
+
   case 0xFF:
     break;
+
+  case 0x01: {
+    uint16_t val = memory_read(cpu->mem, cpu->pc++) |
+                   (memory_read(cpu->mem, cpu->pc++) << 8);
+    cpu->c = val & 0xFF;
+    cpu->b = (val >> 8) & 0xFF;
+    break;
+  }
+
   case 0x06: {
-    uint8_t arg = memory_read(cpu->mem, cpu->pc);
-    cpu->pc++;
+    uint8_t arg = memory_read(cpu->mem, cpu->pc++);
+    cpu->b = arg;
+    break;
+  }
+
+  case 0x0C: {
+    if ((cpu->c & 0x0F) == 0x0F)
+      cpu->f |= FLAG_H;
+    else
+      cpu->f &= ~FLAG_H;
+    cpu->c++;
+    if (cpu->c == 0)
+      cpu->f |= FLAG_Z;
+    else
+      cpu->f &= ~FLAG_Z;
+    cpu->f &= ~FLAG_N;
+    break;
+  }
+
+  case 0x0E: {
+    uint8_t arg = memory_read(cpu->mem, cpu->pc++);
+    cpu->c = arg;
+    break;
+  }
+
+  case 0x16: {
+    uint8_t arg = memory_read(cpu->mem, cpu->pc++);
+    cpu->d = arg;
+    break;
+  }
+
+  case 0x1E: {
+    uint8_t arg = memory_read(cpu->mem, cpu->pc++);
+    cpu->e = arg;
+    break;
+  }
+
+  case 0x26: {
+    uint8_t arg = memory_read(cpu->mem, cpu->pc++);
+    cpu->h = arg;
+    break;
+  }
+
+  case 0x2E: {
+    uint8_t arg = memory_read(cpu->mem, cpu->pc++);
+    cpu->l = arg;
+    break;
+  }
+
+  case 0x3E: {
+    uint8_t arg = memory_read(cpu->mem, cpu->pc++);
     cpu->a = arg;
     break;
   }
+
+  case 0xC3: {
+    uint16_t addr = memory_read(cpu->mem, cpu->pc++) |
+                    (memory_read(cpu->mem, cpu->pc++) << 8);
+    cpu->pc = addr;
+    break;
+  }
+
   case 0xC6: {
-    uint8_t arg = memory_read(cpu->mem, cpu->pc);
-    cpu->pc++;
+    uint8_t arg = memory_read(cpu->mem, cpu->pc++);
+    cpu->f &= ~FLAG_N;
+
+    if ((uint16_t)cpu->a + arg > 0xFF)
+      cpu->f |= FLAG_C;
+    else
+      cpu->f &= ~FLAG_C;
+
+    if ((cpu->a & 0x0F) + (arg & 0x0F) > 0x0F)
+      cpu->f |= FLAG_H;
+    else
+      cpu->f &= ~FLAG_H;
+
     cpu->a += arg;
+
+    if (cpu->a == 0)
+      cpu->f |= FLAG_Z;
+    else
+      cpu->f &= ~FLAG_Z;
+
     break;
   }
+
   case 0xD6: {
-    uint8_t arg = memory_read(cpu->mem, cpu->pc);
-    cpu->pc++;
+    uint8_t arg = memory_read(cpu->mem, cpu->pc++);
+    cpu->f |= FLAG_N;
+
+    if (cpu->a < arg)
+      cpu->f |= FLAG_C;
+    else
+      cpu->f &= ~FLAG_C;
+
+    if ((cpu->a & 0x0F) < (arg & 0x0F))
+      cpu->f |= FLAG_H;
+    else
+      cpu->f &= ~FLAG_H;
+
     cpu->a -= arg;
+
+    if (cpu->a == 0)
+      cpu->f |= FLAG_Z;
+    else
+      cpu->f &= ~FLAG_Z;
+
     break;
   }
+
   case 0xE6: {
-    uint8_t arg = memory_read(cpu->mem, cpu->pc);
-    cpu->pc++;
+    uint8_t arg = memory_read(cpu->mem, cpu->pc++);
     cpu->a &= arg;
+
+    if (cpu->a == 0)
+      cpu->f |= FLAG_Z;
+    else
+      cpu->f &= ~FLAG_Z;
+
+    cpu->f &= ~FLAG_N;
+    cpu->f |= FLAG_H;
+    cpu->f &= ~FLAG_C;
     break;
   }
-  case 0xF6: {
-    uint8_t arg = memory_read(cpu->mem, cpu->pc);
-    cpu->pc++;
-    cpu->a |= arg;
-    break;
-  }
+
   case 0xEE: {
-    uint8_t arg = memory_read(cpu->mem, cpu->pc);
-    cpu->pc++;
+    uint8_t arg = memory_read(cpu->mem, cpu->pc++);
     cpu->a ^= arg;
+
+    if (cpu->a == 0)
+      cpu->f |= FLAG_Z;
+    else
+      cpu->f &= ~FLAG_Z;
+
+    cpu->f &= ~(FLAG_N | FLAG_H | FLAG_C);
     break;
   }
+
+  case 0xF6: {
+    uint8_t arg = memory_read(cpu->mem, cpu->pc++);
+    cpu->a |= arg;
+
+    if (cpu->a == 0)
+      cpu->f |= FLAG_Z;
+    else
+      cpu->f &= ~FLAG_Z;
+
+    cpu->f &= ~(FLAG_N | FLAG_H | FLAG_C);
+    break;
+  }
+
   case 0xFE: {
-    uint8_t arg = memory_read(cpu->mem, cpu->pc);
-    cpu->pc++;
+    uint8_t arg = memory_read(cpu->mem, cpu->pc++);
     uint8_t val = cpu->a - arg;
 
     if (val == 0)
@@ -89,74 +215,12 @@ void cpu_step(CPU *cpu) {
       cpu->f |= FLAG_H;
     else
       cpu->f &= ~FLAG_H;
-    break;
-  }
-  case 0x0C:
-    cpu->a++;
 
-    if (cpu->a == 0)
-      cpu->f |= FLAG_Z;
-    else
-      cpu->f &= ~FLAG_Z;
-
-    cpu->f &= ~FLAG_N;
-
-    if ((cpu->a & 0x0F) == 0)
-      cpu->f |= FLAG_H;
-    else
-      cpu->f &= ~FLAG_H;
-    break;
-  case 0xC3: {
-    uint16_t addr = memory_read(cpu->mem, cpu->pc++) |
-                    (memory_read(cpu->mem, cpu->pc++) << 8);
-    cpu->pc = addr;
-    break;
-  }
-  case 0x0E: {
-    uint8_t arg = memory_read(cpu->mem, cpu->pc);
-    cpu->pc++;
-    cpu->c = arg;
-    break;
-  }
-  case 0x16: {
-    uint8_t arg = memory_read(cpu->mem, cpu->pc);
-    cpu->pc++;
-    cpu->d = arg;
-    break;
-  }
-  case 0x1E: {
-    uint8_t arg = memory_read(cpu->mem, cpu->pc);
-    cpu->pc++;
-    cpu->e = arg;
-    break;
-  }
-  case 0x26: {
-    uint8_t arg = memory_read(cpu->mem, cpu->pc);
-    cpu->pc++;
-    cpu->h = arg;
-    break;
-  }
-  case 0x2E: {
-    uint8_t arg = memory_read(cpu->mem, cpu->pc);
-    cpu->pc++;
-    cpu->l = arg;
-    break;
-  }
-  case 0x3E: {
-    uint8_t arg = memory_read(cpu->mem, cpu->pc);
-    cpu->pc++;
-    cpu->a = arg;
-    break;
-  }
-  case 0x01: {
-    uint16_t val = memory_read(cpu->mem, cpu->pc++) |
-                   (memory_read(cpu->mem, cpu->pc++) << 8);
-    cpu->c = val & 0xFF;
-    cpu->b = (val >> 8) & 0xFF;
     break;
   }
 
   default:
+    fprintf(stderr, "0x%02X, 0x%04X\n", opcode, cpu->pc - 1);
     break;
   }
 }
