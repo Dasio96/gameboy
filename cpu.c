@@ -421,6 +421,62 @@ void cpu_step(CPU *cpu) {
     break;
   }
 
+  case 0xC4: {
+    uint8_t lo = memory_read(cpu->mem, cpu->pc++);
+    uint8_t hi = memory_read(cpu->mem, cpu->pc++);
+    uint16_t target_addr = (hi << 8) | lo;
+
+    if ((cpu->f & FLAG_Z) == 0) {
+      memory_write(cpu->mem, --cpu->sp, cpu->pc >> 8);
+      memory_write(cpu->mem, --cpu->sp, cpu->pc & 0xFF);
+      cpu->pc = target_addr;
+    }
+
+    break;
+  }
+
+  case 0xCC: {
+    uint8_t lo = memory_read(cpu->mem, cpu->pc++);
+    uint8_t hi = memory_read(cpu->mem, cpu->pc++);
+    uint16_t target_addr = (hi << 8) | lo;
+
+    if ((cpu->f & FLAG_Z) != 0) {
+      memory_write(cpu->mem, --cpu->sp, cpu->pc >> 8);
+      memory_write(cpu->mem, --cpu->sp, cpu->pc & 0xFF);
+      cpu->pc = target_addr;
+    }
+
+    break;
+  }
+
+  case 0xD4: {
+    uint8_t lo = memory_read(cpu->mem, cpu->pc++);
+    uint8_t hi = memory_read(cpu->mem, cpu->pc++);
+    uint16_t target_addr = (hi << 8) | lo;
+
+    if ((cpu->f & FLAG_C) == 0) {
+      memory_write(cpu->mem, --cpu->sp, cpu->pc >> 8);
+      memory_write(cpu->mem, --cpu->sp, cpu->pc & 0xFF);
+      cpu->pc = target_addr;
+    }
+
+    break;
+  }
+
+  case 0xDC: {
+    uint8_t lo = memory_read(cpu->mem, cpu->pc++);
+    uint8_t hi = memory_read(cpu->mem, cpu->pc++);
+    uint16_t target_addr = (hi << 8) | lo;
+
+    if ((cpu->f & FLAG_C) != 0) {
+      memory_write(cpu->mem, --cpu->sp, cpu->pc >> 8);
+      memory_write(cpu->mem, --cpu->sp, cpu->pc & 0xFF);
+      cpu->pc = target_addr;
+    }
+
+    break;
+  }
+
   default:
     fprintf(stderr, "0x%02X, 0x%04X\n", opcode, cpu->pc - 1);
     break;
