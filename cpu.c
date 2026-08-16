@@ -477,6 +477,12 @@ void cpu_step(CPU *cpu) {
     break;
   }
 
+  case 0xE9: {
+    cpu->pc = (cpu->h << 8) | cpu->l;
+
+    break;
+  }
+
   default:
     fprintf(stderr, "0x%02X, 0x%04X\n", opcode, cpu->pc - 1);
     break;
