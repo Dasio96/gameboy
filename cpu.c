@@ -219,6 +219,48 @@ void cpu_step(CPU *cpu) {
     break;
   }
 
+  case 0x0D: {
+    if ((cpu->c & 0x0F) == 0x0)
+      cpu->f |= FLAG_H;
+    else
+      cpu->f &= ~FLAG_H;
+
+    cpu->c--;
+
+    if (cpu->c == 0)
+      cpu->f |= FLAG_Z;
+    else
+      cpu->f &= ~FLAG_Z;
+
+    cpu->f |= FLAG_N;
+    break;
+  }
+
+  case 0xDE: {
+    uint8_t arg = memory_read(cpu->mem, cpu->pc++);
+    uint8_t carry = (cpu->f & FLAG_C) >> 4;
+
+    if ((cpu->a & 0x0F) - (arg & 0x0F) - carry < 0)
+      cpu->f |= FLAG_H;
+    else
+      cpu->f &= ~FLAG_H;
+
+    if ((int)cpu->a - (int)arg - (int)carry < 0)
+      cpu->f |= FLAG_C;
+    else
+      cpu->f &= ~FLAG_C;
+
+    cpu->a -= arg + carry;
+
+    if (cpu->a == 0)
+      cpu->f |= FLAG_Z;
+    else
+      cpu->f &= ~FLAG_Z;
+
+    cpu->f |= FLAG_N;
+    break;
+  }
+
   default:
     fprintf(stderr, "0x%02X, 0x%04X\n", opcode, cpu->pc - 1);
     break;
