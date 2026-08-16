@@ -317,6 +317,42 @@ void cpu_step(CPU *cpu) {
     break;
   }
 
+  case 0x20: {
+    int8_t arg = memory_read(cpu->mem, cpu->pc++);
+
+    if ((cpu->f & FLAG_Z) == 0)
+      cpu->pc += arg;
+
+    break;
+  }
+
+  case 0x28: {
+    int8_t arg = memory_read(cpu->mem, cpu->pc++);
+
+    if ((cpu->f & FLAG_Z) != 0)
+      cpu->pc += arg;
+
+    break;
+  }
+
+  case 0x30: {
+    int8_t arg = memory_read(cpu->mem, cpu->pc++);
+
+    if ((cpu->f & FLAG_C) == 0)
+      cpu->pc += arg;
+
+    break;
+  }
+
+  case 0x38: {
+    int8_t arg = memory_read(cpu->mem, cpu->pc++);
+
+    if ((cpu->f & FLAG_C) != 0)
+      cpu->pc += arg;
+
+    break;
+  }
+
   default:
     fprintf(stderr, "0x%02X, 0x%04X\n", opcode, cpu->pc - 1);
     break;
