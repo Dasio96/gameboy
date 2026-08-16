@@ -289,6 +289,34 @@ void cpu_step(CPU *cpu) {
     break;
   }
 
+  case 0xE5: {
+    memory_write(cpu->mem, --cpu->sp, cpu->h);
+    memory_write(cpu->mem, --cpu->sp, cpu->l);
+
+    break;
+  }
+
+  case 0xE1: {
+    cpu->l = memory_read(cpu->mem, cpu->sp++);
+    cpu->h = memory_read(cpu->mem, cpu->sp++);
+
+    break;
+  }
+
+  case 0xF5: {
+    memory_write(cpu->mem, --cpu->sp, cpu->a);
+    memory_write(cpu->mem, --cpu->sp, cpu->f);
+
+    break;
+  }
+
+  case 0xF1: {
+    cpu->f = memory_read(cpu->mem, cpu->sp++) & 0xF0;
+    cpu->a = memory_read(cpu->mem, cpu->sp++);
+
+    break;
+  }
+
   default:
     fprintf(stderr, "0x%02X, 0x%04X\n", opcode, cpu->pc - 1);
     break;
