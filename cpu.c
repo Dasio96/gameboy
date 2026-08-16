@@ -326,7 +326,6 @@ void cpu_step(CPU *cpu) {
 
     break;
   }
-
   case 0x28: {
     int8_t arg = memory_read(cpu->mem, cpu->pc++);
 
@@ -378,6 +377,46 @@ void cpu_step(CPU *cpu) {
     uint8_t lo = memory_read(cpu->mem, cpu->pc++);
     uint8_t hi = memory_read(cpu->mem, cpu->pc++);
     cpu->pc = (hi << 8) | lo;
+
+    break;
+  }
+
+  case 0xC0: {
+    if ((cpu->f & FLAG_Z) == 0) {
+      uint8_t lo = memory_read(cpu->mem, cpu->sp++);
+      uint8_t hi = memory_read(cpu->mem, cpu->sp++);
+      cpu->pc = (hi << 8) | lo;
+    }
+
+    break;
+  }
+
+  case 0xC8: {
+    if ((cpu->f & FLAG_Z) != 0) {
+      uint8_t lo = memory_read(cpu->mem, cpu->sp++);
+      uint8_t hi = memory_read(cpu->mem, cpu->sp++);
+      cpu->pc = (hi << 8) | lo;
+    }
+
+    break;
+  }
+
+  case 0xD0: {
+    if ((cpu->f & FLAG_C) == 0) {
+      uint8_t lo = memory_read(cpu->mem, cpu->sp++);
+      uint8_t hi = memory_read(cpu->mem, cpu->sp++);
+      cpu->pc = (hi << 8) | lo;
+    }
+
+    break;
+  }
+
+  case 0xD8: {
+    if ((cpu->f & FLAG_C) != 0) {
+      uint8_t lo = memory_read(cpu->mem, cpu->sp++);
+      uint8_t hi = memory_read(cpu->mem, cpu->sp++);
+      cpu->pc = (hi << 8) | lo;
+    }
 
     break;
   }
