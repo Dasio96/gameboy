@@ -100,7 +100,6 @@ void cpu_step(CPU *cpu) {
     uint8_t lo = memory_read(cpu->mem, cpu->pc++);
     uint8_t hi = memory_read(cpu->mem, cpu->pc++);
     cpu->pc = (hi << 8) | lo;
-
     break;
   }
 
@@ -262,56 +261,48 @@ void cpu_step(CPU *cpu) {
   case 0xC5: {
     memory_write(cpu->mem, --cpu->sp, cpu->b);
     memory_write(cpu->mem, --cpu->sp, cpu->c);
-
     break;
   }
 
   case 0xC1: {
     cpu->c = memory_read(cpu->mem, cpu->sp++);
     cpu->b = memory_read(cpu->mem, cpu->sp++);
-
     break;
   }
 
   case 0xD5: {
     memory_write(cpu->mem, --cpu->sp, cpu->d);
     memory_write(cpu->mem, --cpu->sp, cpu->e);
-
     break;
   }
 
   case 0xD1: {
     cpu->e = memory_read(cpu->mem, cpu->sp++);
     cpu->d = memory_read(cpu->mem, cpu->sp++);
-
     break;
   }
 
   case 0xE5: {
     memory_write(cpu->mem, --cpu->sp, cpu->h);
     memory_write(cpu->mem, --cpu->sp, cpu->l);
-
     break;
   }
 
   case 0xE1: {
     cpu->l = memory_read(cpu->mem, cpu->sp++);
     cpu->h = memory_read(cpu->mem, cpu->sp++);
-
     break;
   }
 
   case 0xF5: {
     memory_write(cpu->mem, --cpu->sp, cpu->a);
     memory_write(cpu->mem, --cpu->sp, cpu->f);
-
     break;
   }
 
   case 0xF1: {
     cpu->f = memory_read(cpu->mem, cpu->sp++) & 0xF0;
     cpu->a = memory_read(cpu->mem, cpu->sp++);
-
     break;
   }
 
@@ -323,6 +314,7 @@ void cpu_step(CPU *cpu) {
 
     break;
   }
+
   case 0x28: {
     int8_t arg = memory_read(cpu->mem, cpu->pc++);
 
@@ -353,7 +345,6 @@ void cpu_step(CPU *cpu) {
   case 0x18: {
     int8_t arg = memory_read(cpu->mem, cpu->pc++);
     cpu->pc += arg;
-
     break;
   }
 
@@ -366,15 +357,13 @@ void cpu_step(CPU *cpu) {
     memory_write(cpu->mem, --cpu->sp, cpu->pc & 0xFF);
 
     cpu->pc = target_addr;
-
     break;
   }
 
   case 0xC9: {
-    uint8_t lo = memory_read(cpu->mem, cpu->pc++);
-    uint8_t hi = memory_read(cpu->mem, cpu->pc++);
+    uint8_t lo = memory_read(cpu->mem, cpu->sp++);
+    uint8_t hi = memory_read(cpu->mem, cpu->sp++);
     cpu->pc = (hi << 8) | lo;
-
     break;
   }
 
@@ -384,7 +373,6 @@ void cpu_step(CPU *cpu) {
       uint8_t hi = memory_read(cpu->mem, cpu->sp++);
       cpu->pc = (hi << 8) | lo;
     }
-
     break;
   }
 
@@ -394,7 +382,6 @@ void cpu_step(CPU *cpu) {
       uint8_t hi = memory_read(cpu->mem, cpu->sp++);
       cpu->pc = (hi << 8) | lo;
     }
-
     break;
   }
 
@@ -404,7 +391,6 @@ void cpu_step(CPU *cpu) {
       uint8_t hi = memory_read(cpu->mem, cpu->sp++);
       cpu->pc = (hi << 8) | lo;
     }
-
     break;
   }
 
@@ -414,7 +400,6 @@ void cpu_step(CPU *cpu) {
       uint8_t hi = memory_read(cpu->mem, cpu->sp++);
       cpu->pc = (hi << 8) | lo;
     }
-
     break;
   }
 
@@ -428,7 +413,6 @@ void cpu_step(CPU *cpu) {
       memory_write(cpu->mem, --cpu->sp, cpu->pc & 0xFF);
       cpu->pc = target_addr;
     }
-
     break;
   }
 
@@ -442,7 +426,6 @@ void cpu_step(CPU *cpu) {
       memory_write(cpu->mem, --cpu->sp, cpu->pc & 0xFF);
       cpu->pc = target_addr;
     }
-
     break;
   }
 
@@ -456,7 +439,6 @@ void cpu_step(CPU *cpu) {
       memory_write(cpu->mem, --cpu->sp, cpu->pc & 0xFF);
       cpu->pc = target_addr;
     }
-
     break;
   }
 
@@ -470,85 +452,141 @@ void cpu_step(CPU *cpu) {
       memory_write(cpu->mem, --cpu->sp, cpu->pc & 0xFF);
       cpu->pc = target_addr;
     }
-
     break;
   }
 
   case 0xE9: {
     cpu->pc = (cpu->h << 8) | cpu->l;
-
     break;
   }
 
   case 0xC7: {
     memory_write(cpu->mem, --cpu->sp, cpu->pc >> 8);
     memory_write(cpu->mem, --cpu->sp, cpu->pc & 0xFF);
-
     cpu->pc = 0x0000;
-
     break;
   }
 
   case 0xCF: {
     memory_write(cpu->mem, --cpu->sp, cpu->pc >> 8);
     memory_write(cpu->mem, --cpu->sp, cpu->pc & 0xFF);
-
     cpu->pc = 0x0008;
-
     break;
   }
 
   case 0xD7: {
     memory_write(cpu->mem, --cpu->sp, cpu->pc >> 8);
     memory_write(cpu->mem, --cpu->sp, cpu->pc & 0xFF);
-
     cpu->pc = 0x0010;
-
     break;
   }
 
   case 0xDF: {
     memory_write(cpu->mem, --cpu->sp, cpu->pc >> 8);
     memory_write(cpu->mem, --cpu->sp, cpu->pc & 0xFF);
-
     cpu->pc = 0x0018;
-
     break;
   }
 
   case 0xE7: {
     memory_write(cpu->mem, --cpu->sp, cpu->pc >> 8);
     memory_write(cpu->mem, --cpu->sp, cpu->pc & 0xFF);
-
     cpu->pc = 0x0020;
-
     break;
   }
 
   case 0xEF: {
     memory_write(cpu->mem, --cpu->sp, cpu->pc >> 8);
     memory_write(cpu->mem, --cpu->sp, cpu->pc & 0xFF);
-
     cpu->pc = 0x0028;
-
     break;
   }
 
   case 0xF7: {
     memory_write(cpu->mem, --cpu->sp, cpu->pc >> 8);
     memory_write(cpu->mem, --cpu->sp, cpu->pc & 0xFF);
-
     cpu->pc = 0x0030;
-
     break;
   }
 
   case 0xFF: {
     memory_write(cpu->mem, --cpu->sp, cpu->pc >> 8);
     memory_write(cpu->mem, --cpu->sp, cpu->pc & 0xFF);
-
     cpu->pc = 0x0038;
+    break;
+  }
 
+  case 0xCB: {
+    uint8_t cb_opcode = memory_read(cpu->mem, cpu->pc++);
+    switch (cb_opcode) {
+    case 0x7C: {
+      if ((cpu->h & (1 << 7)) == 0)
+        cpu->f |= FLAG_Z;
+      else
+        cpu->f &= ~FLAG_Z;
+
+      cpu->f &= ~FLAG_N;
+      cpu->f |= FLAG_H;
+      break;
+    }
+
+    case 0x7E: {
+      uint16_t addr = (cpu->h << 8) | cpu->l;
+      uint8_t val = memory_read(cpu->mem, addr);
+
+      if ((val & (1 << 7)) == 0)
+        cpu->f |= FLAG_Z;
+      else
+        cpu->f &= ~FLAG_Z;
+
+      cpu->f &= ~FLAG_N;
+      cpu->f |= FLAG_H;
+      break;
+    }
+
+    case 0xF4: {
+      cpu->h |= (1 << 6);
+      break;
+    }
+
+    case 0xB4: {
+      cpu->h &= ~(1 << 6);
+      break;
+    }
+
+    case 0xB5: {
+      cpu->l &= ~(1 << 6);
+      break;
+    }
+
+    case 0xBE: {
+      uint16_t addr = (cpu->h << 8) | cpu->l;
+      uint8_t val = memory_read(cpu->mem, addr);
+      val &= ~(1 << 7);
+      memory_write(cpu->mem, addr, val);
+      break;
+    }
+
+    case 0xFE: {
+      uint16_t addr = (cpu->h << 8) | cpu->l;
+      uint8_t val = memory_read(cpu->mem, addr);
+      val |= (1 << 7);
+      memory_write(cpu->mem, addr, val);
+      break;
+    }
+
+    case 0xDE: {
+      uint16_t addr = (cpu->h << 8) | cpu->l;
+      uint8_t val = memory_read(cpu->mem, addr);
+      val |= (1 << 3);
+      memory_write(cpu->mem, addr, val);
+      break;
+    }
+
+    default:
+      fprintf(stderr, "CB 0x%02X, 0x%04X\n", cb_opcode, cpu->pc - 2);
+      break;
+    }
     break;
   }
 
