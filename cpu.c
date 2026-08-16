@@ -261,6 +261,13 @@ void cpu_step(CPU *cpu) {
     break;
   }
 
+  case 0xC5: {
+    memory_write(cpu->mem, --cpu->sp, cpu->b);
+    memory_write(cpu->mem, --cpu->sp, cpu->c);
+
+    break;
+  }
+
   default:
     fprintf(stderr, "0x%02X, 0x%04X\n", opcode, cpu->pc - 1);
     break;
