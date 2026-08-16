@@ -100,9 +100,10 @@ void cpu_step(CPU *cpu) {
   }
 
   case 0xC3: {
-    uint16_t addr = memory_read(cpu->mem, cpu->pc++) |
-                    (memory_read(cpu->mem, cpu->pc++) << 8);
-    cpu->pc = addr;
+    uint8_t lo = memory_read(cpu->mem, cpu->pc++);
+    uint8_t hi = memory_read(cpu->mem, cpu->pc++);
+    cpu->pc = (hi << 8) | lo;
+
     break;
   }
 
@@ -349,6 +350,13 @@ void cpu_step(CPU *cpu) {
 
     if ((cpu->f & FLAG_C) != 0)
       cpu->pc += arg;
+
+    break;
+  }
+
+  case 0x18: {
+    int8_t arg = memory_read(cpu->mem, cpu->pc++);
+    cpu->pc += arg;
 
     break;
   }
