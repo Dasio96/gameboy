@@ -32,9 +32,6 @@ void cpu_step(CPU *cpu) {
   case 0x00:
     break;
 
-  case 0xFF:
-    break;
-
   case 0x01: {
     uint16_t val = memory_read(cpu->mem, cpu->pc++) |
                    (memory_read(cpu->mem, cpu->pc++) << 8);
@@ -479,6 +476,78 @@ void cpu_step(CPU *cpu) {
 
   case 0xE9: {
     cpu->pc = (cpu->h << 8) | cpu->l;
+
+    break;
+  }
+
+  case 0xC7: {
+    memory_write(cpu->mem, --cpu->sp, cpu->pc >> 8);
+    memory_write(cpu->mem, --cpu->sp, cpu->pc & 0xFF);
+
+    cpu->pc = 0x0000;
+
+    break;
+  }
+
+  case 0xCF: {
+    memory_write(cpu->mem, --cpu->sp, cpu->pc >> 8);
+    memory_write(cpu->mem, --cpu->sp, cpu->pc & 0xFF);
+
+    cpu->pc = 0x0008;
+
+    break;
+  }
+
+  case 0xD7: {
+    memory_write(cpu->mem, --cpu->sp, cpu->pc >> 8);
+    memory_write(cpu->mem, --cpu->sp, cpu->pc & 0xFF);
+
+    cpu->pc = 0x0010;
+
+    break;
+  }
+
+  case 0xDF: {
+    memory_write(cpu->mem, --cpu->sp, cpu->pc >> 8);
+    memory_write(cpu->mem, --cpu->sp, cpu->pc & 0xFF);
+
+    cpu->pc = 0x0018;
+
+    break;
+  }
+
+  case 0xE7: {
+    memory_write(cpu->mem, --cpu->sp, cpu->pc >> 8);
+    memory_write(cpu->mem, --cpu->sp, cpu->pc & 0xFF);
+
+    cpu->pc = 0x0020;
+
+    break;
+  }
+
+  case 0xEF: {
+    memory_write(cpu->mem, --cpu->sp, cpu->pc >> 8);
+    memory_write(cpu->mem, --cpu->sp, cpu->pc & 0xFF);
+
+    cpu->pc = 0x0028;
+
+    break;
+  }
+
+  case 0xF7: {
+    memory_write(cpu->mem, --cpu->sp, cpu->pc >> 8);
+    memory_write(cpu->mem, --cpu->sp, cpu->pc & 0xFF);
+
+    cpu->pc = 0x0030;
+
+    break;
+  }
+
+  case 0xFF: {
+    memory_write(cpu->mem, --cpu->sp, cpu->pc >> 8);
+    memory_write(cpu->mem, --cpu->sp, cpu->pc & 0xFF);
+
+    cpu->pc = 0x0038;
 
     break;
   }
