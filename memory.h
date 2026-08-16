@@ -10,7 +10,8 @@ typedef struct {
 } Memory;
 
 void memory_write(Memory *mem, uint16_t address, uint8_t value);
-
 uint8_t memory_read(Memory *mem, uint16_t address);
+
+int memory_load_rom(Memory *mem, const char *filepath);
 
 #endif // !MEMORY

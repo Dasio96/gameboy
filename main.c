@@ -2,7 +2,7 @@
 #include "memory.h"
 #include <stdio.h>
 
-int main() {
+int main(int argc, char *argv[]) {
   Memory memory;
   CPU cpu;
 
