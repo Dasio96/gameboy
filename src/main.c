@@ -1,5 +1,5 @@
-#include "cpu.h"
-#include "memory.h"
+#include <gameboy/cpu.h>
+#include <gameboy/memory.h>
 #include <stdio.h>
 
 int main(int argc, char *argv[]) {

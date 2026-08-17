@@ -1,4 +1,4 @@
-#include "memory.h"
+#include <gameboy/memory.h>
 
 #include <stdint.h>
 #include <stdio.h>
@@ -18,12 +18,14 @@ int memory_load_rom(Memory *mem, const char *filepath) {
   long file_size = ftell(file);
   rewind(file);
 
-  if (file_size > MEMORY_SIZE)
-    goto cleanup;
-
-  fread(mem->ram, 1, file_size, file);
-
   int success = 1;
+
+  if (file_size < 0 || (size_t)file_size > MEMORY_SIZE) {
+    success = 0;
+    goto cleanup;
+  }
+
+  fread(mem->ram, 1, (size_t)file_size, file);
 
 cleanup:
   fclose(file);
