@@ -615,6 +615,24 @@ void cpu_step(CPU *cpu) {
       break;
     }
 
+    case 0x0F: {
+      uint8_t carry = cpu->a & 1;
+      cpu->a = (cpu->a >> 1) | (carry << 7);
+
+      if (cpu->a == 0)
+        cpu->f |= FLAG_Z;
+      else
+        cpu->f &= ~FLAG_Z;
+
+      if (carry)
+        cpu->f |= FLAG_C;
+      else
+        cpu->f &= ~FLAG_C;
+
+      cpu->f &= ~(FLAG_N | FLAG_H);
+      break;
+    }
+
     default:
       fprintf(stderr, "CB 0x%02X, 0x%04X\n", cb_opcode, cpu->pc - 2);
       break;
