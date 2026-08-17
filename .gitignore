@@ -1,0 +1,16 @@
+build/
+build-*/
+cmake-build-*/
+
+*.o
+*.obj
+*.a
+*.so
+*.dylib
+*.exe
+gameboy
+
+compile_commands.json
+.cache/
+.vscode/
+.idea/
