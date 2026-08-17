@@ -8,7 +8,6 @@ cmake-build-*/
 *.so
 *.dylib
 *.exe
-gameboy
 
 compile_commands.json
 .cache/
