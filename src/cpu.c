@@ -33,10 +33,10 @@ void cpu_step(CPU *cpu) {
     break;
 
   case 0x01: {
-    uint16_t val = memory_read(cpu->mem, cpu->pc++) |
-                   (memory_read(cpu->mem, cpu->pc++) << 8);
-    cpu->c = val & 0xFF;
-    cpu->b = (val >> 8) & 0xFF;
+    uint8_t lo = memory_read(cpu->mem, cpu->pc++);
+    uint8_t hi = memory_read(cpu->mem, cpu->pc++);
+    cpu->c = lo;
+    cpu->b = hi;
     break;
   }
 
@@ -580,6 +580,38 @@ void cpu_step(CPU *cpu) {
       uint8_t val = memory_read(cpu->mem, addr);
       val |= (1 << 3);
       memory_write(cpu->mem, addr, val);
+      break;
+    }
+
+    case 0x37: {
+      uint8_t lo = cpu->a & 0x0F;
+      uint8_t hi = (cpu->a >> 4);
+      cpu->a = (lo << 4) | hi;
+
+      if (cpu->a == 0)
+        cpu->f |= FLAG_Z;
+      else
+        cpu->f &= ~FLAG_Z;
+
+      cpu->f &= ~(FLAG_N | FLAG_H | FLAG_C);
+      break;
+    }
+
+    case 0x07: {
+      uint8_t carry = (cpu->a >> 7) & 1;
+      cpu->a = (cpu->a << 1) | carry;
+
+      if (cpu->a == 0)
+        cpu->f |= FLAG_Z;
+      else
+        cpu->f &= ~FLAG_Z;
+
+      if (carry)
+        cpu->f |= FLAG_C;
+      else
+        cpu->f &= ~FLAG_C;
+
+      cpu->f &= ~(FLAG_N | FLAG_H);
       break;
     }
 
