@@ -26,6 +26,7 @@ void cpu_init(CPU *cpu, Memory *memory) {
 
 void cpu_step(CPU *cpu) {
   uint8_t opcode = memory_read(cpu->mem, cpu->pc);
+  uint16_t hl = (cpu->h << 8) | cpu->l;
   cpu->pc++;
 
   switch (opcode) {
@@ -513,6 +514,48 @@ void cpu_step(CPU *cpu) {
     memory_write(cpu->mem, --cpu->sp, cpu->pc >> 8);
     memory_write(cpu->mem, --cpu->sp, cpu->pc & 0xFF);
     cpu->pc = 0x0038;
+    break;
+  }
+
+  case 0x7E: {
+    cpu->a = memory_read(cpu->mem, hl);
+    break;
+  }
+
+  case 0x77: {
+    memory_write(cpu->mem, hl, cpu->a);
+    break;
+  }
+
+  case 0x22: {
+    memory_write(cpu->mem, hl, cpu->a);
+    hl++;
+    cpu->h = hl >> 8;
+    cpu->l = hl & 0xFF;
+    break;
+  }
+
+  case 0x2A: {
+    cpu->a = memory_read(cpu->mem, hl);
+    hl++;
+    cpu->h = hl >> 8;
+    cpu->l = hl & 0xFF;
+    break;
+  }
+
+  case 0x32: {
+    memory_write(cpu->mem, hl, cpu->a);
+    hl--;
+    cpu->h = hl >> 8;
+    cpu->l = hl & 0xFF;
+    break;
+  }
+
+  case 0x3A: {
+    cpu->a = memory_read(cpu->mem, hl);
+    hl--;
+    cpu->h = hl >> 8;
+    cpu->l = hl & 0xFF;
     break;
   }
 
