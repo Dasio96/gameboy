@@ -583,6 +583,30 @@ void cpu_step(CPU *cpu) {
     break;
   }
 
+  case 0xE0: {
+    uint8_t arg = memory_read(cpu->mem, cpu->pc++);
+    uint16_t addr = 0xFF00 + arg;
+    memory_write(cpu->mem, addr, cpu->a);
+    break;
+  }
+
+  case 0xF0: {
+    uint8_t arg = memory_read(cpu->mem, cpu->pc++);
+    uint16_t addr = 0xFF00 + arg;
+    cpu->a = memory_read(cpu->mem, addr);
+    break;
+  }
+
+  case 0xE2: {
+    memory_write(cpu->mem, 0xFF00 + cpu->c, cpu->a);
+    break;
+  }
+
+  case 0xF2: {
+    cpu->a = memory_read(cpu->mem, 0xFF00 + cpu->c);
+    break;
+  }
+
   case 0xCB: {
     uint8_t cb_opcode = memory_read(cpu->mem, cpu->pc++);
     switch (cb_opcode) {
