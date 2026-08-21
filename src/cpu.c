@@ -559,6 +559,30 @@ void cpu_step(CPU *cpu) {
     break;
   }
 
+  case 0x0A: {
+    uint16_t addr = (cpu->b << 8) | cpu->c;
+    cpu->a = memory_read(cpu->mem, addr);
+    break;
+  }
+
+  case 0x02: {
+    uint16_t addr = (cpu->b << 8) | cpu->c;
+    memory_write(cpu->mem, addr, cpu->a);
+    break;
+  }
+
+  case 0x1A: {
+    uint16_t addr = (cpu->d << 8) | cpu->e;
+    cpu->a = memory_read(cpu->mem, addr);
+    break;
+  }
+
+  case 0x12: {
+    uint16_t addr = (cpu->d << 8) | cpu->e;
+    memory_write(cpu->mem, addr, cpu->a);
+    break;
+  }
+
   case 0xCB: {
     uint8_t cb_opcode = memory_read(cpu->mem, cpu->pc++);
     switch (cb_opcode) {
